@@ -1,0 +1,11 @@
+alembic
+configparser
+fastapi
+python-decouple
+psycopg2
+python-dotenv
+pytest
+requests
+squareup
+sqlmodel
+uvicorn
