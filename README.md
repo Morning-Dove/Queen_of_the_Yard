@@ -28,7 +28,12 @@ Install Requirements: Install the required Python packages listed in requirement
 pip install - r requirements.txt
 ```
 
-Run the Application: Use uvicorn to run the application and access the SwaggerUI interface by running http://localhost:8000/docs#
+Run the Application: Use uvicorn to run the application.
 ```sh
 uvicorn main:app
+```
+
+Access the SwaggerUI interface by running 
+```sh
+http://localhost:8000/docs#
 ```
