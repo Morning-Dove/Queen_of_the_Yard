@@ -33,7 +33,7 @@ Run the Application: Use uvicorn to run the application.
 uvicorn main:app
 ```
 
-Access the SwaggerUI interface by running 
+Access the SwaggerUI interface by running:
 ```sh
 http://localhost:8000/docs#
 ```

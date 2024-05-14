@@ -68,6 +68,8 @@ class Invoice(SQLModel, table=True):
 
 class Customer(SQLModel, table=True):
     customerId: int | None = Field(default=None, primary_key=True)
+    jobId: int | None = Field(default=None, foreign_key="job.jobId")
+    job: 'Job' = Relationship(back_populates="customer")
     fName: str
     lName: str
     phoneNumber: str
@@ -82,6 +84,7 @@ class Customer(SQLModel, table=True):
     comments: str
     invoices: list[Invoice] = Relationship(back_populates="customer")
     frequency: Frequency = Relationship(back_populates="customer")
+
 
 
 class Employee(SQLModel, table=True):
@@ -113,7 +116,6 @@ class Expense(SQLModel, table=True):
 
 class Job(SQLModel, table=True):
     jobId: int | None = Field(default=None, primary_key=True)
-    customerId: int = Field(foreign_key="customer.customerId")
     arrivalWindow: str
     clockIn: str
     clockOut: str
@@ -126,6 +128,7 @@ class Job(SQLModel, table=True):
     isClosed: bool
     extraExpenses: list[Expense] = Relationship(back_populates="job")
     invoice: Invoice = Relationship(back_populates="job")
+    customer: Customer = Relationship(back_populates="job")
 
 
 
