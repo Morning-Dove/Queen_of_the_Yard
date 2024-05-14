@@ -1,8 +1,8 @@
 """create table
 
-Revision ID: 72f78906bc08
+Revision ID: 960068e50467
 Revises: 
-Create Date: 2024-05-14 09:14:37.095527
+Create Date: 2024-05-14 11:30:10.975208
 
 """
 from typing import Sequence
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = '72f78906bc08'
+revision: str = '960068e50467'
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -46,21 +46,12 @@ def upgrade() -> None:
     sa.Column('weeklyHours', sa.Float(), nullable=False),
     sa.PrimaryKeyConstraint('empId')
     )
-    op.create_table('invoice',
-    sa.Column('invoiceId', sa.Integer(), nullable=False),
+    op.create_table('frequency',
+    sa.Column('frequencyId', sa.Integer(), nullable=False),
+    sa.Column('serviceFrequency', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('customerId', sa.Integer(), nullable=False),
-    sa.Column('lotSize', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('invoiceDate', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('dueDate', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('emailStatus', sa.Boolean(), nullable=False),
-    sa.Column('productsUsed', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('acceptedBy', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('applyTax', sa.Boolean(), nullable=False),
-    sa.Column('taxAmount', sa.Float(), nullable=False),
-    sa.Column('totalEstimate', sa.Float(), nullable=False),
-    sa.Column('paid', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['customerId'], ['customer.customerId'], ),
-    sa.PrimaryKeyConstraint('invoiceId')
+    sa.PrimaryKeyConstraint('frequencyId')
     )
     op.create_table('job',
     sa.Column('jobId', sa.Integer(), nullable=False),
@@ -79,8 +70,8 @@ def upgrade() -> None:
     op.create_table('user',
     sa.Column('userId', sa.Integer(), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('empId', sa.Integer(), nullable=False),
-    sa.Column('customerId', sa.Integer(), nullable=False),
+    sa.Column('empId', sa.Integer(), nullable=True),
+    sa.Column('customerId', sa.Integer(), nullable=True),
     sa.Column('password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.ForeignKeyConstraint(['customerId'], ['customer.customerId'], ),
     sa.ForeignKeyConstraint(['empId'], ['employee.empId'], ),
@@ -90,7 +81,9 @@ def upgrade() -> None:
     sa.Column('accountTypeId', sa.Integer(), nullable=False),
     sa.Column('isResidential', sa.Boolean(), nullable=False),
     sa.Column('isCommercial', sa.Boolean(), nullable=False),
-    sa.Column('jobId', sa.Integer(), nullable=False),
+    sa.Column('jobId', sa.Integer(), nullable=True),
+    sa.Column('customerId', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['customerId'], ['customer.customerId'], ),
     sa.ForeignKeyConstraint(['jobId'], ['job.jobId'], ),
     sa.PrimaryKeyConstraint('accountTypeId')
     )
@@ -102,31 +95,44 @@ def upgrade() -> None:
     sa.Column('totalAmount', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('reason', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('purchasedBy', sa.Integer(), nullable=False),
-    sa.Column('linkedJob', sa.Integer(), nullable=False),
+    sa.Column('linkedJob', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['linkedJob'], ['job.jobId'], ),
     sa.ForeignKeyConstraint(['purchasedBy'], ['employee.empId'], ),
     sa.PrimaryKeyConstraint('expenseId')
     )
-    op.create_table('frequency',
-    sa.Column('frequencyId', sa.Integer(), nullable=False),
-    sa.Column('serviceFrequency', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('jobId', sa.Integer(), nullable=False),
+    op.create_table('invoice',
+    sa.Column('invoiceId', sa.Integer(), nullable=False),
+    sa.Column('customerId', sa.Integer(), nullable=False),
+    sa.Column('lotSize', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('invoiceDate', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('dueDate', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('emailStatus', sa.Boolean(), nullable=False),
+    sa.Column('productsUsed', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('acceptedBy', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('applyTax', sa.Boolean(), nullable=False),
+    sa.Column('taxAmount', sa.Float(), nullable=False),
+    sa.Column('totalEstimate', sa.Float(), nullable=False),
+    sa.Column('paid', sa.Boolean(), nullable=False),
+    sa.Column('jobId', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['customerId'], ['customer.customerId'], ),
     sa.ForeignKeyConstraint(['jobId'], ['job.jobId'], ),
-    sa.PrimaryKeyConstraint('frequencyId')
+    sa.PrimaryKeyConstraint('invoiceId')
     )
     op.create_table('servicearea',
     sa.Column('serviceAreaId', sa.Integer(), nullable=False),
     sa.Column('townServiced', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('jobId', sa.Integer(), nullable=False),
+    sa.Column('jobId', sa.Integer(), nullable=True),
+    sa.Column('customerId', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['customerId'], ['customer.customerId'], ),
     sa.ForeignKeyConstraint(['jobId'], ['job.jobId'], ),
     sa.PrimaryKeyConstraint('serviceAreaId')
     )
     op.create_table('services',
     sa.Column('serviceId', sa.Integer(), nullable=False),
     sa.Column('service', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('invoiceId', sa.Integer(), nullable=False),
-    sa.Column('customerId', sa.Integer(), nullable=False),
-    sa.Column('jobId', sa.Integer(), nullable=False),
+    sa.Column('invoiceId', sa.Integer(), nullable=True),
+    sa.Column('customerId', sa.Integer(), nullable=True),
+    sa.Column('jobId', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['customerId'], ['customer.customerId'], ),
     sa.ForeignKeyConstraint(['invoiceId'], ['invoice.invoiceId'], ),
     sa.ForeignKeyConstraint(['jobId'], ['job.jobId'], ),
@@ -139,12 +145,12 @@ def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('services')
     op.drop_table('servicearea')
-    op.drop_table('frequency')
+    op.drop_table('invoice')
     op.drop_table('expense')
     op.drop_table('accounttype')
     op.drop_table('user')
     op.drop_table('job')
-    op.drop_table('invoice')
+    op.drop_table('frequency')
     op.drop_table('employee')
     op.drop_table('customer')
     # ### end Alembic commands ###
