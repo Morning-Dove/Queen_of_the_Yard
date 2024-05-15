@@ -1,8 +1,8 @@
-"""remove frequency in job
+"""Restart from working state
 
-Revision ID: e7488992914a
-Revises: 3d15cf691bde
-Create Date: 2024-05-14 11:42:39.493694
+Revision ID: 0e5355397ca1
+Revises: 43e317e95d76
+Create Date: 2024-05-15 14:09:21.290095
 
 """
 from typing import Sequence
@@ -13,8 +13,8 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e7488992914a'
-down_revision: str | None = '3d15cf691bde'
+revision: str = '0e5355397ca1'
+down_revision: str | None = '43e317e95d76'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
