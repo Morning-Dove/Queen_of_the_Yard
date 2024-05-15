@@ -21,7 +21,7 @@ Clone Repository: Clone the repository to your local machine.
 requires python version 3.10 or greater
 ```
 
-Set Up Virtual Environment: Navigate to the backend folder and set up a virtual environment using your preferred method.
+Set Up Virtual Environment: Set up a virtual environment using your preferred method.
 
 Install Requirements: Install the required Python packages listed in requirements.txt.
 ```sh
