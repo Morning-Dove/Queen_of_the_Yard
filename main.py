@@ -1,5 +1,4 @@
 import os
-import datetime
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
@@ -39,13 +38,13 @@ client = Client(
 # *** SERVICES ***
 #
 
-@app.get("/services")
+@app.get("/services", tags=["Services"])
 async def get_services(db: Session = Depends(get_db)) -> list[Services]:
     return db.exec(select(Services)).all()
 
 
 # Creates a service
-@app.post("/services")
+@app.post("/services", tags=["Services"])
 async def create_service(service: Services, db: Session = Depends(get_db)):
     db.add(service)
     db.commit()
@@ -53,9 +52,9 @@ async def create_service(service: Services, db: Session = Depends(get_db)):
 
 
 # Updates or Creates a Service
-@app.put("/services/{serviceId}")
-async def update_service(serviceId: int, updated_service: Services, db: Session = Depends(get_db)):
-    existing_service = db.get(Services, serviceId)
+@app.put("/services/{service}", tags=["Services"])
+async def update_service(service: str, updated_service: Services, db: Session = Depends(get_db)):
+    existing_service = db.get(Services, service)
     if not updated_service:
         db.add(updated_service)
         db.commit()
@@ -69,10 +68,10 @@ async def update_service(serviceId: int, updated_service: Services, db: Session 
 
 
 # Delete a service by serviceId
-@app.delete("/services/{serviceId}")
-async def delete_service(serviceId: int, db: Session = Depends(get_db)):
-    service = db.get(Services, serviceId)
-    if not service:
+@app.delete("/services/{serviceId}", tags=["Services"])
+async def delete_service(service: str, db: Session = Depends(get_db)):
+    services = db.get(Services, service)
+    if not services:
         raise HTTPException(status_code=404, detail="Service not found")
     db.delete(service)
     db.commit()
@@ -83,39 +82,40 @@ async def delete_service(serviceId: int, db: Session = Depends(get_db)):
 # ***FREQUENCY***
 #
 
-@app.get("/frequency")
+@app.get("/frequency", tags=["Frequency"])
 async def get_frequency(db: Session = Depends(get_db)) -> list[Frequency]:
     return db.exec(select(Frequency)).all()
 
 
 # Creates a frequency for time of service
-@app.post("/frequency")
-async def create_service(frequency: Frequency, db: Session = Depends(get_db)):
+@app.post("/frequency", tags=["Frequency"])
+async def create_frequency(frequency: Frequency, db: Session = Depends(get_db)):
+    frequency = ["Weekly, Bi-Weekly, Monthly"]
     db.add(frequency)
     db.commit()
     raise HTTPException(status_code=201, detail="Service Created")
 
 
 # Updates or Creates a Service
-@app.put("/frequency/{frequencyId}")
-async def update_service(frequencyId: int, updated_frequency: Frequency, db: Session = Depends(get_db)):
-    existing_frequency = db.get(Frequency, frequencyId)
+@app.put("/frequency/{frequencyId}", tags=["Frequency"])
+async def update_frequency(frequency: str, updated_frequency: Frequency, db: Session = Depends(get_db)):
+    existing_frequency = db.get(Frequency, frequency)
     if not updated_frequency:
         db.add(updated_frequency)
         db.commit()
-        raise HTTPException(status_code=201, detail="Service Created")
+        raise HTTPException(status_code=201, detail="Frequency Created")
     for key, value in updated_frequency.model_dump().items():
         setattr(existing_frequency, key, value)
     db.add(existing_frequency)
     db.commit()
-    raise HTTPException(status_code=201, detail="Service Updated")
+    raise HTTPException(status_code=201, detail="Frequency Updated")
 
 
 # Delete frequency of service by frequencyId
-@app.delete("/frequency/{frequencyId}")
-async def delete_service(frequencyId: int, db: Session = Depends(get_db)):
-    frequency = db.get(Services, frequencyId)
-    if not frequency:
+@app.delete("/frequency/{frequencyId}", tags=["Frequency"])
+async def delete_frequency(frequency: str, db: Session = Depends(get_db)):
+    frequencies = db.get(Frequency, frequency)
+    if not frequencies:
         raise HTTPException(status_code=404, detail="Frequency of service not found")
     db.delete(frequency)
     db.commit()
@@ -126,7 +126,7 @@ async def delete_service(frequencyId: int, db: Session = Depends(get_db)):
 # *** ACCOUNT TYPE ***
 #
 
-@app.get("/accounttype")
+@app.get("/accounttype", tags=["Account Type"])
 async def get_account_type(db: Session = Depends(get_db)) -> list[AccountType]:
     return db.exec(select(AccountType)).all()
 
@@ -135,21 +135,21 @@ async def get_account_type(db: Session = Depends(get_db)) -> list[AccountType]:
 # *** SERVICE AREA ***
 #
 
-@app.get("/servicearea")
+@app.get("/servicearea", tags=["Service Area"])
 async def get_service_area(db: Session = Depends(get_db)) -> list[ServiceArea]:
     return db.exec(select(ServiceArea)).all()
 
 
 # Creates a Service Area
-@app.post("/servicearea")
-async def get_service_area(serviceArea: ServiceArea, db: Session = Depends(get_db)):
+@app.post("/servicearea", tags=["Service Area"])
+async def create_service_area(serviceArea: ServiceArea, db: Session = Depends(get_db)):
     db.add(serviceArea)
     db.commit()
     raise HTTPException(status_code=201, detail="Service Area Created")
 
 
 # Updates or Creates a town within the service area
-@app.put("/servicearea/{serviceAreaId}")
+@app.put("/servicearea/{serviceAreaId}", tags=["Service Area"])
 async def update_service_area(serviceAreaId: int, updated_serviceArea: ServiceArea, db: Session = Depends(get_db)):
     existing_serviceArea = db.get(ServiceArea, serviceAreaId)
     if not existing_serviceArea:
@@ -164,123 +164,40 @@ async def update_service_area(serviceAreaId: int, updated_serviceArea: ServiceAr
 
 
 # Delete a town in a service area by serviceAreaId
-@app.delete("/servicearea/{serviceAreaId}")
-async def delete_customer(serviceAreaId: int, db: Session = Depends(get_db)):
-    serviceArea = db.get(Customer, serviceAreaId)
+@app.delete("/servicearea/{serviceAreaId}", tags=["Service Area"])
+async def delete_service_area(serviceAreaId: int, db: Session = Depends(get_db)):
+    serviceArea = db.get(ServiceArea, serviceAreaId)
     if not serviceArea:
         raise HTTPException(status_code=404, detail="Service Area not found")
-    db.delete(serviceAreaId)
+    db.delete(serviceArea)
     db.commit()
     raise HTTPException(status_code=200, detail="Service Area Deleted")
 
 
-#
-# *** USER ***
-#
-
-@app.get("/user")
-async def get_user(db: Session = Depends(get_db)) -> list[User]:
-    return db.exec(select(User)).all()
-
-# Creates a user
-@app.post("/user")
-async def create_user(user: User, db: Session = Depends(get_db)):
-    db.add(user)
-    db.commit()
-    raise HTTPException(status_code=201, detail="User Created")
-
-
-# Updates or Creates a User
-@app.put("/user/{userId}")
-async def update_user(userId: int, updated_user: User, db: Session = Depends(get_db)):
-    exsisting_user = db.get(User, userId)
-    if not exsisting_user:
-        db.add(updated_user)
-        db.commit()
-        raise HTTPException(status=201, detial="User created")
-    for key, value in updated_user.model_dump().items():
-        setattr(exsisting_user, key, value)
-    db.add(exsisting_user)
-    db.commit()
-    raise HTTPException(status_code=201, detail="User Updated.")
-
-
-# Delete a user by userId
-@app.delete("/user/{userId}")
-async def delete_user(userId: int, db: Session = Depends(get_db)):
-    user = db.get(User, userId)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.delete(user)
-    db.commit()
-    raise HTTPException(status_code=200, detail="User Deleted")
-
-
-#
-# ** INVOICE ***
-#
-
-#Returns a invoice by Id or a list of all invoices
-@app.get("/invoice")
-async def get_invoice(invoiceId: int = None, db: Session = Depends(get_db)):
-    if invoiceId:
-        return [db.get(Invoice, invoiceId)]
-    return db.exec(select(Invoice)).all()
-
-
-# Creates an Invoice
-@app.post("/invoice")
-async def create_customer(invoice: Invoice, db: Session = Depends(get_db)):
-    db.add(invoice)
-    db.commit()
-    raise HTTPException(status_code=201, detail="Invoice Created")
-
-
-# Updates or Creates a Invoice
-@app.put("/invoice/{invoiceId}")
-async def update_customer(invoiceId: int, updated_invoice: Invoice, db: Session = Depends(get_db)):
-    existing_invoice = db.get(Invoice, invoiceId)
-    if not existing_invoice:
-        db.add(updated_invoice)
-        db.commit()
-        raise HTTPException(status_code=201, detail="Invoice Created")
-    for key, value in updated_invoice.model_dump().items():
-        setattr(existing_invoice, key, value)
-    db.add(existing_invoice)
-    db.commit()
-    raise HTTPException(status_code=201, detail="Invoice Updated")
-
-
-# Deletes a invoice by invoiceId
-@app.delete("/invoice/{invoiceId}")
-async def delete_customer(invoiceId: int, db: Session = Depends(get_db)):
-    invoice = db.get(Invoice, invoiceId)
-    if not invoice:
-        raise HTTPException(status_code=404, detail="Invoice not found")
-    db.delete(invoice)
-    db.commit()
-    raise HTTPException(status_code=200, detail="Invoice Deleted")
 
 #
 # ***CUSTOMER***
 #
 
 #Returns a customer by Id or a list of all customers
-@app.get("/customer")
+@app.get("/customer", tags=["Customer"])
 async def get_customers(custId: int = None, db: Session = Depends(get_db)):
     if custId:
         return [db.get(Customer, custId)]
     return db.exec(select(Customer)).all()
 
+
 # Creates a customer
-@app.post("/customer")
+@app.post("/customer", tags=["Customer"])
 async def create_customer(customer: Customer, db: Session = Depends(get_db)):
-    db.add(customer)
+    db_customer = Customer(**customer.model_dump())
+    db.add(db_customer)
     db.commit()
     raise HTTPException(status_code=201, detail="Customer Created")
 
+
 # Updates or Creates a Customer
-@app.put("/customer/{customerId}")
+@app.put("/customer/{customerId}", tags=["Customer"])
 async def update_customer(custId: int, updated_customer: Customer, db: Session = Depends(get_db)):
     existing_customer = db.get(Customer, custId)
     if not existing_customer:
@@ -294,7 +211,7 @@ async def update_customer(custId: int, updated_customer: Customer, db: Session =
     raise HTTPException(status_code=201, detail="Customer Updated")
 
 # Deletes a customer by CustomerId
-@app.delete("/customer/{customerId}")
+@app.delete("/customer/{customerId}", tags=["Customer"])
 async def delete_customer(custId: int, db: Session = Depends(get_db)):
     customer = db.get(Customer, custId)
     if not customer:
@@ -309,21 +226,24 @@ async def delete_customer(custId: int, db: Session = Depends(get_db)):
 #
 
 #Returns an employee by Id or a list of all employees
-@app.get("/employee")
+@app.get("/employee", tags=["Employee"])
 async def get_employee(EmpId: int = None, db: Session = Depends(get_db)):
     if EmpId:
         return [db.get(Employee, EmpId)]
     return db.exec(select(Employee)).all()
 
+
 # Creates an Employee
-@app.post("/employee")
+@app.post("/employee", tags=["Employee"])
 async def create_employee(employee: Employee, db: Session = Depends(get_db)):
-    db.add(employee)
+    db_employee = Employee(**employee.model_dump())
+    db.add(db_employee)
     db.commit()
     raise HTTPException(status_code=201, detail="Employee Created")
 
+
 # Updates or Creates a Employee
-@app.put("/employee/{EmpId}")
+@app.put("/employee/{EmpId}", tags=["Employee"])
 async def update_employee(EmpId: int, updated_employee: Employee, db: Session = Depends(get_db)):
     existing_employee = db.get(Employee, EmpId)
     if not updated_employee:
@@ -336,8 +256,9 @@ async def update_employee(EmpId: int, updated_employee: Employee, db: Session = 
     db.commit()
     raise HTTPException(status_code=201, detail="Employee Updated")
 
+
 # Delete an employee by EmpId
-@app.delete("/employee/{EmpId}")
+@app.delete("/employee/{EmpId}", tags=["Employee"])
 async def delete_employee(EmpId: int, db: Session = Depends(get_db)):
     employee = db.get(Employee, EmpId)
     if not employee:
@@ -348,11 +269,101 @@ async def delete_employee(EmpId: int, db: Session = Depends(get_db)):
 
 
 #
+# *** USER ***
+#
+
+@app.get("/user", tags=['Users'])
+async def get_user(db: Session = Depends(get_db)) -> list[User]:
+    return db.exec(select(User)).all()
+
+# Creates a user
+@app.post("/user",tags=['Users'])
+async def create_user(user: User, db: Session = Depends(get_db)):
+    db_user = User(**user.model_dump())
+    db.add(db_user)
+    db.commit()
+    raise HTTPException(status_code=201, detail="User Created")
+
+
+# Updates or Creates a User
+@app.put("/user/{userId}", tags=['Users'])
+async def update_user(userId: int, updated_user: User, db: Session = Depends(get_db)):
+    exsisting_user = db.get(User, userId)
+    if not exsisting_user:
+        db.add(updated_user)
+        db.commit()
+        raise HTTPException(status=201, detial="User created")
+    for key, value in updated_user.model_dump().items():
+        setattr(exsisting_user, key, value)
+    db.add(exsisting_user)
+    db.commit()
+    raise HTTPException(status_code=201, detail="User Updated.")
+
+
+# Delete a user by userId
+@app.delete("/user/{userId}", tags=['Users'])
+async def delete_user(userId: int, db: Session = Depends(get_db)):
+    user = db.get(User, userId)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    raise HTTPException(status_code=200, detail="User Deleted")
+
+
+#
+# ** INVOICE ***
+#
+
+#Returns a invoice by Id or a list of all invoices
+@app.get("/invoice", tags=["Invoice"])
+async def get_invoice(invoiceId: int = None, db: Session = Depends(get_db)):
+    if invoiceId:
+        return [db.get(Invoice, invoiceId)]
+    return db.exec(select(Invoice)).all()
+
+
+# Creates an Invoice
+@app.post("/invoice", tags=["Invoice"])
+async def create_invoice(invoice: Invoice, db: Session = Depends(get_db)):
+    db_invoice = Invoice(**invoice.model_dump())
+    db.add(db_invoice)
+    db.commit()
+    raise HTTPException(status_code=201, detail="Invoice Created")
+
+
+# Updates or Creates a Invoice
+@app.put("/invoice/{invoiceId}", tags=["Invoice"])
+async def update_invoice(invoiceId: int, updated_invoice: Invoice, db: Session = Depends(get_db)):
+    existing_invoice = db.get(Invoice, invoiceId)
+    if not existing_invoice:
+        db.add(updated_invoice)
+        db.commit()
+        raise HTTPException(status_code=201, detail="Invoice Created")
+    for key, value in updated_invoice.model_dump().items():
+        setattr(existing_invoice, key, value)
+    db.add(existing_invoice)
+    db.commit()
+    raise HTTPException(status_code=201, detail="Invoice Updated")
+
+
+# Deletes a invoice by invoiceId
+@app.delete("/invoice/{invoiceId}", tags=["Invoice"])
+async def delete_invoice(invoiceId: int, db: Session = Depends(get_db)):
+    invoice = db.get(Invoice, invoiceId)
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    db.delete(invoice)
+    db.commit()
+    raise HTTPException(status_code=200, detail="Invoice Deleted")
+
+
+#
 # *** EXPENSE ***
 #
 
 #Returns an expense by Id or a list of all Expenses
-@app.get("/expense")
+@app.get("/expense", tags=["Expense"])
 async def get_expense(ExpenseId: int = None, db: Session = Depends(get_db)):
     if ExpenseId:
         return [db.get(Expense, ExpenseId)]
@@ -360,15 +371,17 @@ async def get_expense(ExpenseId: int = None, db: Session = Depends(get_db)):
 
 
 # Creates an Expense
-@app.post("/expense")
+@app.post("/expense", tags=["Expense"])
 async def create_expense(expense: Expense, db: Session = Depends(get_db)):
-    db.add(expense)
+    db_expense = Expense(**expense.model_dump())
+    db.add(db_expense)
     db.commit()
     raise HTTPException(status_code=201, detail="Expense Created")
 
 
+
 # Updates or Creates a Expense
-@app.put("/expense/{EmpId}")
+@app.put("/expense/{EmpId}", tags=["Expense"])
 async def update_expense(EmpId: int, updated_expense: Expense, db: Session = Depends(get_db)):
     existing_expense = db.get(Expense, EmpId)
     if not updated_expense:
@@ -383,7 +396,7 @@ async def update_expense(EmpId: int, updated_expense: Expense, db: Session = Dep
 
 
 # Delete an expense by expenseId
-@app.delete("/expense/{expenseId}")
+@app.delete("/expense/{expenseId}", tags=["Expense"])
 async def delete_expense(expenseId: int, db: Session = Depends(get_db)):
     expense = db.get(Expense, expenseId)
     if not expense:
@@ -398,21 +411,21 @@ async def delete_expense(expenseId: int, db: Session = Depends(get_db)):
 #
 
 #Returns a job by Id or a list of all jobs
-@app.get("/job")
+@app.get("/job", tags=["Job"])
 async def get_jobs(jobId: int = None, db: Session = Depends(get_db)):
     if jobId:
         return [db.get(Job, jobId)]
     return db.exec(select(Job)).all()
 
 # Creates a Job
-@app.post("/job")
+@app.post("/job", tags=["Job"])
 async def create_job(job: Job, db: Session = Depends(get_db)):
     db.add(job)
     db.commit()
     raise HTTPException(status_code=201, detail="Job Created")
 
 # Updates or Creates a Job
-@app.put("/job/{JobId}")
+@app.put("/job/{JobId}", tags=["Job"])
 async def update_job(jobId: int, updated_job: Job, db: Session = Depends(get_db)):
     existing_job = db.get(Job, jobId)
     if not existing_job:
@@ -426,7 +439,7 @@ async def update_job(jobId: int, updated_job: Job, db: Session = Depends(get_db)
     raise HTTPException(status_code=201, detail="Job Updated")
 
 # Deletes a Job by JobId
-@app.delete("/job/{JobId}")
+@app.delete("/job/{JobId}", tags=["Job"])
 async def delete_job(jobId: int, db: Session = Depends(get_db)):
     job = db.get(Job, jobId)
     if not job:
@@ -449,7 +462,7 @@ async def delete_job(jobId: int, db: Session = Depends(get_db)):
 
 
 #Retrieves a list of payments taken by the account making the request.
-@app.get("/payments")
+@app.get("/payments", tags=["Square Payment"])
 async def list_payments():
     response = requests.get(url=f"{URL}/payments", headers=headers)
 
@@ -461,7 +474,7 @@ async def list_payments():
         raise HTTPException(status_code=404, detail="Payment not found")
 
 
-@app.get("/payments/{payment_id}")
+@app.get("/payments/{payment_id}", tags=["Square Payment"])
 async def GetPayment(payment_id: str) -> dict:
     response = requests.get(url=f"{URL}/payments/{payment_id}", headers=headers)
     
@@ -474,7 +487,7 @@ async def GetPayment(payment_id: str) -> dict:
 
 
 # #Creates a payment using the provided source.
-@app.post("/payments")
+@app.post("/payments", tags=["Square Payment"])
 async def create_payment(amount: int, source_id: str, idempotency_key) -> dict:
     payload = {
         "source_id": source_id,
@@ -494,10 +507,10 @@ async def create_payment(amount: int, source_id: str, idempotency_key) -> dict:
         raise Exception(f"Failed to create payment: {response.text}")
 
 
-# Completes (captures) a payment. Runs after create payment.
-@app.post("/payments/{payment_id}/complete")
-async def complete_payment(payment_id):
-    pass
+# # Completes (captures) a payment. Runs after create payment.
+# @app.post("/payments/{payment_id}/complete")
+# async def complete_payment(payment_id):
+#     pass
 
 # #Cancels (voids) a payment.
 # @app.post("/payments/{payment_id}/cancel")

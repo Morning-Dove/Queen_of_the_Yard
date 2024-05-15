@@ -129,7 +129,3 @@ class Job(SQLModel, table=True):
     extraExpenses: list[Expense] = Relationship(back_populates="job")
     invoice: Invoice = Relationship(back_populates="job")
     customer: Customer = Relationship(back_populates="job")
-
-
-
-
