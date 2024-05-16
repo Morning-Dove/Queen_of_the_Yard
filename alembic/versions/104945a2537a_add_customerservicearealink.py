@@ -1,8 +1,8 @@
-"""Restart from working state
+"""Add customerservicearealink
 
-Revision ID: 0e5355397ca1
-Revises: 43e317e95d76
-Create Date: 2024-05-15 14:09:21.290095
+Revision ID: 104945a2537a
+Revises: f63f50ba53d1
+Create Date: 2024-05-16 12:05:29.579413
 
 """
 from typing import Sequence
@@ -13,8 +13,8 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0e5355397ca1'
-down_revision: str | None = '43e317e95d76'
+revision: str = '104945a2537a'
+down_revision: str | None = 'f63f50ba53d1'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

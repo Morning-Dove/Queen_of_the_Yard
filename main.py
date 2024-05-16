@@ -49,17 +49,11 @@ async def create_service(service: Services, db: Session = Depends(get_db)):
     raise HTTPException(status_code=201, detail="Service Created")
 
 
-
-
-
-############ DOES NOT CREATE A SERVICE
-
-
 # # Updates or Creates a Service
 @app.put("/services/{service}", tags=["Services"])
 async def update_service(serviceId: int, updated_service: Services, db: Session = Depends(get_db)):
     existing_service = db.get(Services, serviceId)
-    if not updated_service:
+    if not existing_service:
         db.add(updated_service)
         db.commit()
         raise HTTPException(status_code=201, detail="Service Created")
@@ -94,7 +88,6 @@ async def get_frequency(db: Session = Depends(get_db)) -> list[Frequency]:
 # Creates a frequency for time of service
 @app.post("/frequency", tags=["Frequency"])
 async def create_frequency(frequency: Frequency, db: Session = Depends(get_db)):
-    frequency = ["Weekly, Bi-Weekly, Monthly"]
     db.add(frequency)
     db.commit()
     raise HTTPException(status_code=201, detail="Service Created")
@@ -102,12 +95,13 @@ async def create_frequency(frequency: Frequency, db: Session = Depends(get_db)):
 
 # Updates or Creates a Service
 @app.put("/frequency/{frequencyId}", tags=["Frequency"])
-async def update_frequency(frequency: str, updated_frequency: Frequency, db: Session = Depends(get_db)):
-    existing_frequency = db.get(Frequency, frequency)
-    if not updated_frequency:
+async def update_frequency(frequencyId: int, updated_frequency: Frequency, db: Session = Depends(get_db)):
+    existing_frequency = db.get(Frequency, frequencyId)
+    if not existing_frequency:
         db.add(updated_frequency)
         db.commit()
         raise HTTPException(status_code=201, detail="Frequency Created")
+    
     for key, value in updated_frequency.model_dump().items():
         setattr(existing_frequency, key, value)
     db.add(existing_frequency)
@@ -117,22 +111,13 @@ async def update_frequency(frequency: str, updated_frequency: Frequency, db: Ses
 
 # Delete frequency of service by frequencyId
 @app.delete("/frequency/{frequencyId}", tags=["Frequency"])
-async def delete_frequency(frequency: str, db: Session = Depends(get_db)):
-    frequencies = db.get(Frequency, frequency)
+async def delete_frequency(frequencyId: int, db: Session = Depends(get_db)):
+    frequencies = db.get(Frequency, frequencyId)
     if not frequencies:
         raise HTTPException(status_code=404, detail="Frequency of service not found")
-    db.delete(frequency)
+    db.delete(frequencies)
     db.commit()
     raise HTTPException(status_code=200, detail="Frequency Deleted")
-
-
-#
-# *** ACCOUNT TYPE ***
-#
-
-# @app.get("/accounttype", tags=["Account Type"])
-# async def get_account_type(db: Session = Depends(get_db)) -> list[AccountType]:
-#     return db.exec(select(AccountType)).all()
 
 
 #
@@ -250,7 +235,7 @@ async def create_employee(employee: Employee, db: Session = Depends(get_db)):
 @app.put("/employee/{EmpId}", tags=["Employee"])
 async def update_employee(EmpId: int, updated_employee: Employee, db: Session = Depends(get_db)):
     existing_employee = db.get(Employee, EmpId)
-    if not updated_employee:
+    if not existing_employee:
         db.add(updated_employee)
         db.commit()
         raise HTTPException(status_code=201, detail="Employee Created")
@@ -300,57 +285,18 @@ async def create_user(user: User, db: Session = Depends(get_db)):
     raise HTTPException(status_code=201, detail="User Created")
 
 
-
-
-# # Creates a user
-# @app.post("/user",tags=['Users'])
-# async def create_user(user: User, db: Session = Depends(get_db)):
-    
-#     if not isinstance(content, str):
-#         raise TypeError("Not a valid string")
-#     if "@" not in content:
-#         raise TypeError("Does not have an '@' sign")
-
-#     # Ends with .com/.edu/.net/.org
-#     # TLD -> Top Level Domain, which is com/org/net
-#     valid_tlds: list[str] = [".com", ".edu", ".net", ".org"]
-#     tld = content[-4:]
-#     if tld not in valid_tlds:
-#         raise TypeError("Invalid TLD")
-
-#     # Check for domain (stuff between @ and .com)
-#     domain_start = content.find("@")+1
-#     domain = content[at_sign_index:-4]
-#     if domain == "":
-#         raise TypeError("Invalid Domain")
-
-#     # Check for content before @
-#     if content.find("@") == 0:
-#         raise TypeError("Invalid username")
-
-#     return self.content
-
-
-
-
-
-#     db_user = User(**user.model_dump())
-#     db.add(db_user)
-#     db.commit()
-#     raise HTTPException(status_code=201, detail="User Created")
-
-
 # Updates or Creates a User
 @app.put("/user/{userId}", tags=['Users'])
 async def update_user(userId: int, updated_user: User, db: Session = Depends(get_db)):
-    exsisting_user = db.get(User, userId)
-    if not exsisting_user:
-        db.add(updated_user)
-        db.commit()
-        raise HTTPException(status=201, detial="User created")
+    existing_user = db.get(User, userId)
+    if not existing_user:
+        create_user(updated_user)
+        # db.add(updated_user)
+        # db.commit()
+        raise HTTPException(status_code=201, detail="User created")
     for key, value in updated_user.model_dump().items():
-        setattr(exsisting_user, key, value)
-    db.add(exsisting_user)
+        setattr(existing_user, key, value)
+    db.add(existing_user)
     db.commit()
     raise HTTPException(status_code=201, detail="User Updated.")
 
@@ -434,12 +380,11 @@ async def create_expense(expense: Expense, db: Session = Depends(get_db)):
     raise HTTPException(status_code=201, detail="Expense Created")
 
 
-
 # Updates or Creates a Expense
 @app.put("/expense/{EmpId}", tags=["Expense"])
 async def update_expense(EmpId: int, updated_expense: Expense, db: Session = Depends(get_db)):
     existing_expense = db.get(Expense, EmpId)
-    if not updated_expense:
+    if not existing_expense:
         db.add(updated_expense)
         db.commit()
         raise HTTPException(status_code=201, detail="Expense Created")
@@ -534,15 +479,13 @@ async def list_payments():
 async def GetPayment(payment_id: str) -> dict:
     response = requests.get(url=f"{URL}/payments/{payment_id}", headers=headers)
     
-    # Check if the request was successful (status code 200)
     if response.status_code == 200:
-        # Parse and return the JSON response
         return response.json()
     else:
         raise HTTPException(status_code=404, detail="Payment not found with payment_id {payment_id}")
 
 
-# #Creates a payment using the provided source.
+#Creates a payment using the provided source.
 @app.post("/payments", tags=["Square Payment"])
 async def create_payment(amount: int, source_id: str, idempotency_key) -> dict:
     payload = {
