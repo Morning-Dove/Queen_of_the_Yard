@@ -1,5 +1,5 @@
 import os
-
+import re
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Session, select
 from square.client import Client
@@ -9,14 +9,14 @@ from dotenv import load_dotenv
 import requests
 
 from database import get_db
-from schema import Customer, Invoice, Job, User, Employee, Expense, Services, Frequency, AccountType, ServiceArea
+from schema import Customer, Invoice, Job, User, Employee, Expense, Services, Frequency, ServiceArea
 
 
 URL = "https://connect.squareupsandbox.com/v2"
 TOKEN = os.getenv("TOKEN")
 SQ_APPLICATION_ID = os.getenv("SQ_APPLICATION_ID")
 SQ_APPLICATION_SECRET = os.getenv("SQ_APPLICATION_SECRET")
-SQUARE_ACCESS_TOKEN = os.getenv("SQUARE_ACCESS_TOKEN")
+SQUARE_ACCESS_TOKEN = "SQUARE_ACCESS_TOKEN"#os.getenv("SQUARE_ACCESS_TOKEN")
 
 app = FastAPI()
 load_dotenv()
@@ -27,10 +27,8 @@ headers: dict[str, str] = {
 }
 
 client = Client(
-    access_token=SQUARE_ACCESS_TOKEN,
-    bearer_auth_credentials= BearerAuthCredentials(
-        access_token=SQUARE_ACCESS_TOKEN
-    ),
+    #access_token=SQUARE_ACCESS_TOKEN,
+    bearer_auth_credentials=BearerAuthCredentials(access_token=SQUARE_ACCESS_TOKEN),
     environment='sandbox')
 
 
@@ -51,10 +49,16 @@ async def create_service(service: Services, db: Session = Depends(get_db)):
     raise HTTPException(status_code=201, detail="Service Created")
 
 
-# Updates or Creates a Service
+
+
+
+############ DOES NOT CREATE A SERVICE
+
+
+# # Updates or Creates a Service
 @app.put("/services/{service}", tags=["Services"])
-async def update_service(service: str, updated_service: Services, db: Session = Depends(get_db)):
-    existing_service = db.get(Services, service)
+async def update_service(serviceId: int, updated_service: Services, db: Session = Depends(get_db)):
+    existing_service = db.get(Services, serviceId)
     if not updated_service:
         db.add(updated_service)
         db.commit()
@@ -69,9 +73,9 @@ async def update_service(service: str, updated_service: Services, db: Session = 
 
 # Delete a service by serviceId
 @app.delete("/services/{serviceId}", tags=["Services"])
-async def delete_service(service: str, db: Session = Depends(get_db)):
-    services = db.get(Services, service)
-    if not services:
+async def delete_service(serviceId: int, db: Session = Depends(get_db)):
+    service = db.get(Services, serviceId)
+    if not service:
         raise HTTPException(status_code=404, detail="Service not found")
     db.delete(service)
     db.commit()
@@ -126,9 +130,9 @@ async def delete_frequency(frequency: str, db: Session = Depends(get_db)):
 # *** ACCOUNT TYPE ***
 #
 
-@app.get("/accounttype", tags=["Account Type"])
-async def get_account_type(db: Session = Depends(get_db)) -> list[AccountType]:
-    return db.exec(select(AccountType)).all()
+# @app.get("/accounttype", tags=["Account Type"])
+# async def get_account_type(db: Session = Depends(get_db)) -> list[AccountType]:
+#     return db.exec(select(AccountType)).all()
 
 
 #
@@ -276,13 +280,64 @@ async def delete_employee(EmpId: int, db: Session = Depends(get_db)):
 async def get_user(db: Session = Depends(get_db)) -> list[User]:
     return db.exec(select(User)).all()
 
+
 # Creates a user
-@app.post("/user",tags=['Users'])
+@app.post("/user", tags=['Users'])
 async def create_user(user: User, db: Session = Depends(get_db)):
+    email = user.email
+
+    # Regular expression pattern for validating email addresses
+    email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+
+    # Validate email address format
+    if not re.match(email_pattern, email):
+        raise HTTPException(status_code=400, detail="Invalid email address")
+
+    # If the email is valid, continue with creating the user
     db_user = User(**user.model_dump())
     db.add(db_user)
     db.commit()
     raise HTTPException(status_code=201, detail="User Created")
+
+
+
+
+# # Creates a user
+# @app.post("/user",tags=['Users'])
+# async def create_user(user: User, db: Session = Depends(get_db)):
+    
+#     if not isinstance(content, str):
+#         raise TypeError("Not a valid string")
+#     if "@" not in content:
+#         raise TypeError("Does not have an '@' sign")
+
+#     # Ends with .com/.edu/.net/.org
+#     # TLD -> Top Level Domain, which is com/org/net
+#     valid_tlds: list[str] = [".com", ".edu", ".net", ".org"]
+#     tld = content[-4:]
+#     if tld not in valid_tlds:
+#         raise TypeError("Invalid TLD")
+
+#     # Check for domain (stuff between @ and .com)
+#     domain_start = content.find("@")+1
+#     domain = content[at_sign_index:-4]
+#     if domain == "":
+#         raise TypeError("Invalid Domain")
+
+#     # Check for content before @
+#     if content.find("@") == 0:
+#         raise TypeError("Invalid username")
+
+#     return self.content
+
+
+
+
+
+#     db_user = User(**user.model_dump())
+#     db.add(db_user)
+#     db.commit()
+#     raise HTTPException(status_code=201, detail="User Created")
 
 
 # Updates or Creates a User
@@ -468,6 +523,7 @@ async def list_payments():
 
     if response.status_code == 200:
         payments = response.json()['payments']
+        print(payments)
         return payments
     else:
         print(f"Error: {response.status_code}, {response.text}")
