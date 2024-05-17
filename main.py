@@ -18,13 +18,16 @@ SQ_APPLICATION_ID = os.getenv("SQ_APPLICATION_ID")
 SQ_APPLICATION_SECRET = os.getenv("SQ_APPLICATION_SECRET")
 SQUARE_ACCESS_TOKEN = "SQUARE_ACCESS_TOKEN"#os.getenv("SQUARE_ACCESS_TOKEN")
 
+
 app = FastAPI()
 load_dotenv()
+
 
 headers: dict[str, str] = {
     'Authorization': f'Bearer {TOKEN}',
     'Content-Type': 'application/json',
 }
+
 
 client = Client(
     #access_token=SQUARE_ACCESS_TOKEN,
@@ -35,6 +38,7 @@ client = Client(
 #
 # *** SERVICES ***
 #
+
 
 @app.get("/services", tags=["Services"])
 async def get_services(db: Session = Depends(get_db)) -> list[Services]:
@@ -124,6 +128,7 @@ async def delete_frequency(frequencyId: int, db: Session = Depends(get_db)):
 # *** SERVICE AREA ***
 #
 
+
 @app.get("/servicearea", tags=["Service Area"])
 async def get_service_area(db: Session = Depends(get_db)) -> list[ServiceArea]:
     return db.exec(select(ServiceArea)).all()
@@ -163,10 +168,10 @@ async def delete_service_area(serviceAreaId: int, db: Session = Depends(get_db))
     raise HTTPException(status_code=200, detail="Service Area Deleted")
 
 
-
 #
 # ***CUSTOMER***
 #
+
 
 #Returns a customer by Id or a list of all customers
 @app.get("/customer", tags=["Customer"])
@@ -199,6 +204,7 @@ async def update_customer(custId: int, updated_customer: Customer, db: Session =
     db.commit()
     raise HTTPException(status_code=201, detail="Customer Updated")
 
+
 # Deletes a customer by CustomerId
 @app.delete("/customer/{customerId}", tags=["Customer"])
 async def delete_customer(custId: int, db: Session = Depends(get_db)):
@@ -213,6 +219,7 @@ async def delete_customer(custId: int, db: Session = Depends(get_db)):
 #
 # ***EMPLOYEE***
 #
+
 
 #Returns an employee by Id or a list of all employees
 @app.get("/employee", tags=["Employee"])
@@ -261,6 +268,7 @@ async def delete_employee(EmpId: int, db: Session = Depends(get_db)):
 # *** USER ***
 #
 
+
 @app.get("/user", tags=['Users'])
 async def get_user(db: Session = Depends(get_db)) -> list[User]:
     return db.exec(select(User)).all()
@@ -271,7 +279,6 @@ async def get_user(db: Session = Depends(get_db)) -> list[User]:
 async def create_user(user: User, db: Session = Depends(get_db)):
     email = user.email
 
-    # Regular expression pattern for validating email addresses
     email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 
     if not re.match(email_pattern, email):
@@ -313,6 +320,7 @@ async def delete_user(userId: int, db: Session = Depends(get_db)):
 #
 # ** INVOICE ***
 #
+
 
 #Returns a invoice by Id or a list of all invoices
 @app.get("/invoice", tags=["Invoice"])
@@ -361,6 +369,7 @@ async def delete_invoice(invoiceId: int, db: Session = Depends(get_db)):
 # *** EXPENSE ***
 #
 
+
 #Returns an expense by Id or a list of all Expenses
 @app.get("/expense", tags=["Expense"])
 async def get_expense(ExpenseId: int = None, db: Session = Depends(get_db)):
@@ -408,6 +417,7 @@ async def delete_expense(expenseId: int, db: Session = Depends(get_db)):
 # ***JOB***
 #
 
+
 #Returns a job by Id or a list of all jobs
 @app.get("/job", tags=["Job"])
 async def get_jobs(jobId: int = None, db: Session = Depends(get_db)):
@@ -415,12 +425,14 @@ async def get_jobs(jobId: int = None, db: Session = Depends(get_db)):
         return [db.get(Job, jobId)]
     return db.exec(select(Job)).all()
 
+
 # Creates a Job
 @app.post("/job", tags=["Job"])
 async def create_job(job: Job, db: Session = Depends(get_db)):
     db.add(job)
     db.commit()
     raise HTTPException(status_code=201, detail="Job Created")
+
 
 # Updates or Creates a Job
 @app.put("/job/{JobId}", tags=["Job"])
@@ -436,6 +448,7 @@ async def update_job(jobId: int, updated_job: Job, db: Session = Depends(get_db)
     db.commit()
     raise HTTPException(status_code=201, detail="Job Updated")
 
+
 # Deletes a Job by JobId
 @app.delete("/job/{JobId}", tags=["Job"])
 async def delete_job(jobId: int, db: Session = Depends(get_db)):
@@ -445,8 +458,6 @@ async def delete_job(jobId: int, db: Session = Depends(get_db)):
     db.delete(job)
     db.commit()
     raise HTTPException(status_code=200, detail="Job Deleted")
-
-
 
 
 #########################################################
