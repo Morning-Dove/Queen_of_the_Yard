@@ -492,11 +492,10 @@ async def GetPayment(payment_id: str) -> dict:
         return response.json()
     else:
         raise HTTPException(status_code=404, detail="Payment not found with payment_id {payment_id}")
+    
 
-
-#Creates a payment using the provided source.
 @app.post("/payments", tags=["Square Payment"])
-async def create_payment(amount: int, source_id: str, idempotency_key) -> dict:
+async def create_payment(amount: int, source_id: str, idempotency_key: str):
     payload = {
         "source_id": source_id,
         "idempotency_key": idempotency_key,
@@ -507,12 +506,15 @@ async def create_payment(amount: int, source_id: str, idempotency_key) -> dict:
     }
 
     url = f"{URL}/payments"
-    response = client.payments.create_payment(payload)
-    
+    response = requests.post(url, json=payload, headers=headers)
+
     if response.status_code == 200:
-        return response.body
+        return response.json()
     else:
-        raise Exception(f"Failed to create payment: {response.text}")
+        error_detail = response.json()["errors"][0]["detail"] if "errors" in response.json() else response.text
+        print(error_detail)
+        raise HTTPException(status_code=response.status_code, detail=f"Failed to create payment: {error_detail}")
+
 
 
 # # Completes (captures) a payment. Runs after create payment.
