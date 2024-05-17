@@ -483,7 +483,7 @@ async def list_payments():
         print(f"Error: {response.status_code}, {response.text}")
         raise HTTPException(status_code=404, detail="Payment not found")
 
-
+# Gets a Payment by ID
 @app.get("/payments/{payment_id}", tags=["Square Payment"])
 async def GetPayment(payment_id: str) -> dict:
     response = requests.get(url=f"{URL}/payments/{payment_id}", headers=headers)
@@ -494,6 +494,7 @@ async def GetPayment(payment_id: str) -> dict:
         raise HTTPException(status_code=404, detail="Payment not found with payment_id {payment_id}")
     
 
+# Creates a Payment in Square. Dollar amount is in cents. 100 = $1.00
 @app.post("/payments", tags=["Square Payment"])
 async def create_payment(amount: int, source_id: str, idempotency_key: str):
     payload = {
@@ -512,7 +513,6 @@ async def create_payment(amount: int, source_id: str, idempotency_key: str):
         return response.json()
     else:
         error_detail = response.json()["errors"][0]["detail"] if "errors" in response.json() else response.text
-        print(error_detail)
         raise HTTPException(status_code=response.status_code, detail=f"Failed to create payment: {error_detail}")
 
 
