@@ -90,7 +90,7 @@ async def get_frequency(db: Session = Depends(get_db)) -> list[Frequency]:
 async def create_frequency(frequency: Frequency, db: Session = Depends(get_db)):
     db.add(frequency)
     db.commit()
-    raise HTTPException(status_code=201, detail="Service Created")
+    raise HTTPException(status_code=201, detail="Frequency Created")
 
 
 # Updates or Creates a Service
@@ -274,11 +274,9 @@ async def create_user(user: User, db: Session = Depends(get_db)):
     # Regular expression pattern for validating email addresses
     email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 
-    # Validate email address format
     if not re.match(email_pattern, email):
         raise HTTPException(status_code=400, detail="Invalid email address")
 
-    # If the email is valid, continue with creating the user
     db_user = User(**user.model_dump())
     db.add(db_user)
     db.commit()
@@ -290,9 +288,9 @@ async def create_user(user: User, db: Session = Depends(get_db)):
 async def update_user(userId: int, updated_user: User, db: Session = Depends(get_db)):
     existing_user = db.get(User, userId)
     if not existing_user:
-        create_user(updated_user)
-        # db.add(updated_user)
-        # db.commit()
+        #create_user(updated_user)
+        db.add(updated_user)
+        db.commit()
         raise HTTPException(status_code=201, detail="User created")
     for key, value in updated_user.model_dump().items():
         setattr(existing_user, key, value)
