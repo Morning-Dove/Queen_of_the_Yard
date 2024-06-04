@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./style.css" rel="stylesheet" type="text/css">
+    <title>Queen of the Yard Lawn Care</title>
+    <link rel="icon" href="photos/crown-logo.png" id="crown-logo">
+</head>
+<body>
+    <header>
+        <nav id="center-links">
+            <a class="nav-links" href="#Home">Home</a>
+            <a class="nav-links" href="#services">Services</a>
+            <a class="nav-links" href="#contact">Contact Us</a>
+            <!-- <a class="nav-links" href="#book-now">Book Now</a> -->
+            <!-- <button type="submit" id="login-button">Login</button> -->
+        </nav>
+    </header>
+
+    <section id="Home">
+        <div id="container">
+            <h1>Queen of the Yard Lawn Care</h1>
+            <img src="photos/Home-blades-of-grass-copy.jpg" id="blade-grass" alt="green blades of grass">
+            <section id="center-text-logo">
+                <div class="logo-block">
+                    <img src="photos/circle_goat.png" alt="Queen of the Yard Lawn Care Logo">
+                </div>
+                <div class="text-block">
+                    <p>
+                        We specialize in providing top-tier lawn maintenance, landscaping, and gardening services. 
+                        Our team of skilled professionals combines years of experience with a creative flair, 
+                        ensuring each project is meticulously executed to exceed our clients' expectations. 
+                        From manicured lawns to blooming gardens, we take pride in enhancing the beauty and functionality of every yard we touch.
+                        At Queen of the Yard, we believe that every outdoor space deserves to be treated like a crown jewel, 
+                        and we're here to make that vision a reality for homeowners and business.
+                    </p>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <section id="services">
+        <br>
+        <h2>Services</h2>
+        <div id="services-container">
+            <ul class="services-list" id="sl1">
+                <li>Mowing & Edging</li>
+                <li>Residential Fencing</li>
+                <li>Seasonal Cleanup</li>
+            </ul>
+     
+                <img src="photos/lawnMower.png" id="lawnMower-logo" alt="lawn mower graphic">
+
+            <ul class="services-list" id="sl2">
+                <li>Weed Removal</li>
+                <li>Trimming</li>
+                <li>Mulching & Fertilizing</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="contact">
+        <br>
+        <h2>Contact Us</h2>
+        <div id="serving-welcomes">
+            <p>Proudly serving: Twin Falls, Jerome, Shoshone, Dietrich, Gooding<br>
+                <br>
+            We Welcome You!<br>
+            It is always time to sign up for the season or for year round service! <br>
+            We are expanding and have room for our weekly customers, so contact us today for a free quote.<br>
+            <br>
+            Thank you for considering our services! 
+            <br>
+            We believe you will be pleasantly surprised.<br>
+            <br>
+            <br>
+            Email: queenoftheyardcompost@gmail.com<br>
+            <br>
+            Phone: (208)993-3140<br>
+            <br>
+            <br>
+            <a href="tel: +12085694218" id="callBtn" alt="Call us at +1(208)569-3140">Call Us!</a>
+
+        </p>
+
+        </div>
+    </section>
+    <section id="book-now">
+        <h2>Send Us A Message</h2>
+        <p>Hello, please let us know what services you are looking for and how to best contact you!</p>
+        
+        <div class="container">
+        <form action="/contact-form-handler.php" id="contact-form" method="POST">
+        <div class="row">
+            <div class="col-25">
+                <label for="name">Name: </label>
+            </div>
+            <div class="col-75">
+                <input type="text" id="name" name="name" placeholder="Your name..." required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+                <label for="email">Email: </label>
+            </div>
+            <div class="col-75">
+                <input type="text" id="email" name="email" placeholder="Your email..." required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+                <label for="phone">Phone Number: </label>
+            </div>
+            <div class="col-75">
+                <input type="text" id="phone" name="phone" placeholder="Your phone number.." required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+            <label for="message">Message: </label>
+            </div>
+            <div class="col-75">
+                <textarea id="message" name="subject" placeholder="Let us know how we can help..." required></textarea>
+            </div>
+        </div>
+        <br>
+        <div class="row1">
+            <input type="submit" value="Submit" id="submitEmailBtn">
+        </div>
+        </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>2024 &copy; Queen of the Yard Lawn Care - All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
