@@ -5,6 +5,10 @@ from sqlmodel import Session, select
 from square.client import Client
 from square.http.auth.o_auth_2 import BearerAuthCredentials
 
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from dotenv import load_dotenv
 import requests
 
@@ -458,6 +462,27 @@ async def delete_job(jobId: int, db: Session = Depends(get_db)):
     db.delete(job)
     db.commit()
     raise HTTPException(status_code=200, detail="Job Deleted")
+
+
+# Email Submission
+
+
+def send_email(smtp_server, smtp_port, from_email, password, subject, body, to_email):
+    # Set up the server
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.login(from_email, password)
+
+    # Create the email
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    # Send the email
+    server.send_message(msg)
+    server.quit()
 
 
 #########################################################
