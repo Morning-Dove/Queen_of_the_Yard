@@ -120,6 +120,7 @@ nav{
 }
 
 #center-text-logo {
+    padding-top: 15vh;
     display: inline-flex;
     justify-content: space-evenly;
     align-items: center;
@@ -135,7 +136,7 @@ nav{
 }
 
 .logo-block img {
-    max-width: 80%;
+    max-width: 70%;
     height: auto;
     background: rgba(232, 229, 229, 0);
 }
@@ -185,7 +186,7 @@ nav{
 }
 
 #lawnMower-logo {
-    max-width: 500px;
+    max-width: 60%;
     height: auto;
 }
 
@@ -300,6 +301,9 @@ input[type=submit]:hover {
 .container {
     padding: 20px;
     width:60%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
 }
 
 .col-25 {
@@ -329,15 +333,44 @@ input[type=submit]:hover {
     clear: both;
 }
 
-/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
-@media screen and (max-width: 600px) {
-.col-25, .col-75, input[type=submit] {
-    width: 100%;
-    margin-top: 0;
-}
-}
-
 footer{
     text-align: center;
     margin: 15px;
 }
+
+
+/* Responsive layout - when the screen is less than 1000px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 1000px) {
+    .text-block p {
+        font-size: 20px;
+    }
+
+    h1 {
+        font-size: 45px;
+    }
+
+}
+
+
+
+/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 670px) {
+    .col-25, .col-75, input[type=submit] {
+        width: 100%;
+        margin-top: 0;
+    }
+    .text-block p {
+        font-size: 16px;
+        padding-bottom: 15px;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+
+    .logo-block {
+        display: none;
+    }
+
+}
+
