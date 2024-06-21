@@ -1,5 +1,7 @@
 # Queen of the Yard Lawn Care API
 
+To view the site on GitHub Pages please click this link: https://morning-dove.github.io/QueenoftheYard/
+
 A backend system for managing the business operations for Queen of the Yard Lawn Care.
 
 **Database Models:** The code defines several SQLModels representing different entities in the business, such as customers, employees, expenses, invoices, jobs, services, frequency of service, account types, and service areas. These models map to database tables and define the structure of the data stored in the database.
